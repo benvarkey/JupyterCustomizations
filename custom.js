@@ -8,6 +8,7 @@
  * c. Toolbar entry to add show/hide checkbox for each cell
  * d. Hide all marked cells when Notebook is launched
  * e. Open gVim to edit current cell and update with saved content
+ * f. Increase/Decrease input code size
  *
  * Other settings:
  * i.  Show line numbers by default in code cells
@@ -30,6 +31,17 @@ function code_toggle() {
     }
     code_show = !code_show;
 } 
+
+function code_change_fontsize(doIncrease) {
+    input_cells = $('div.CodeMirror-lines')
+    for(var i = 0; i < input_cells.length; i++){
+        _style = input_cells[i].style;
+        _size = _style.getPropertyValue("font-size");
+        if(_size == null)
+            _style.setProperty("font-size", "15px");
+        _incrementer = (doIncrease ? +5 : -5);
+        _style.setProperty("font-size", +(/\d+/.exec(_size)[0]) + _incrementer + "px")}
+}
 
 require([
     'base/js/namespace',
@@ -55,6 +67,23 @@ require([
                      'icon'    : 'fa-code', // select your icon from http://fortawesome.github.io/Font-Awesome/icons
                      'callback': function () {
                         $( document ).ready(code_toggle);
+                     }
+                },
+                /*
+                 * g. Button to increase/decrease code font size
+                 */
+                {
+                     'label'   : 'Increase code font size',
+                     'icon'    : 'fa-search-plus',
+                     'callback': function () {
+                        $( document ).ready(code_change_fontsize(true));
+                     }
+                },
+                {
+                     'label'   : 'Decrease code font size',
+                     'icon'    : 'fa-search-minus',
+                     'callback': function () {
+                        $( document ).ready(code_change_fontsize(false));
                      }
                 }
                 
