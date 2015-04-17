@@ -33,14 +33,38 @@ function code_toggle() {
 } 
 
 function code_change_fontsize(doIncrease) {
-    input_cells = $('div.CodeMirror-lines')
-    for(var i = 0; i < input_cells.length; i++){
-        _style = input_cells[i].style;
-        _size = _style.getPropertyValue("font-size");
-        if(_size == null)
-            _style.setProperty("font-size", "15px");
-        _incrementer = (doIncrease ? +5 : -5);
-        _style.setProperty("font-size", +(/\d+/.exec(_size)[0]) + _incrementer + "px")}
+    var pre_css = null;
+    var pre_style = null;
+    for(i = 0; i < document.styleSheets.length; i++){
+        if(/localhost.*\/static\/custom\/custom\.css/.test(document.styleSheets[i].href)){ //if style sheet is custom.css
+            pre_css = document.styleSheets[i]; //pre_css now contains the style sheet custom.css
+            break;
+        }
+    }
+
+    for(i = 0; i < pre_css.cssRules.length; i++){
+        if(/\.CodeMirror pre/.test(pre_css.cssRules[i].selectorText)){
+            pre_style = pre_css.cssRules[i].style;
+            break;
+        }
+    }
+
+    if(pre_style == null){
+        pre_css.insertRule(".CodeMirror pre { font-size: \"14px\"; padding-bottom: \"0px\"; }", 0);
+        pre_style = pre_css.cssRules[0];
+    }
+
+    var font_size = pre_style.fontSize;
+    if(font_size == "")
+        font_size = 14;
+    else
+        font_size = +/\d+/.exec(font_size)[0];
+    font_size += (doIncrease ? +3 : -3);
+    font_size = (font_size < 8 ? 8 : font_size);
+    var padding_size = (font_size <= 14 ? 0 : (font_size - 14));
+
+    pre_style.paddingBottom = padding_size + "px";
+    pre_style.fontSize = font_size + "px";
 }
 
 require([
